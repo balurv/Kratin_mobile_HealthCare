@@ -1,7 +1,10 @@
 package com.example.healthcare.kratin.model;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.Set;
+
+import com.example.healthcare.kratin.model.enums.Gender;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -44,7 +47,7 @@ public class Person {
 		
 	}
 
-	public Person(String name, String email, LocalDate dateOfBirth, String phoneNumber, com.example.healthcare.kratin.model.enums.Gender gender) {
+	public Person(String name, String email, LocalDate dateOfBirth, String phoneNumber, Gender gender) {
 		this.name = name;
 		this.email = email;
 		this.dateOfBirth = dateOfBirth;
@@ -121,6 +124,11 @@ public class Person {
 		}
 	}
 
+	public int getPersonAge(LocalDate dateOfBirth) {
+		Period period = Period.between(dateOfBirth, LocalDate.now());
+		return period.getYears();
+	}
+	
 	public void clearFitness() {
 		// TODO Auto-generated method stub
 		

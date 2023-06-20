@@ -1,7 +1,5 @@
 package com.example.healthcare.kratin.service;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,7 +23,7 @@ import com.example.healthcare.kratin.requestModel.UpdatePerson;
 public class PersonService {
 	@Autowired
 	private PersonRepository personRepository;
-	
+
 	@Autowired
 	private FitnessRepository fitnessRepository;
 
@@ -42,7 +40,7 @@ public class PersonService {
 				// TODO Auto-generated method stub
 				return p1.getDateOfBirth().compareTo(p2.getDateOfBirth());
 			}
-			
+
 		});
 		return person;
 	}
@@ -51,10 +49,10 @@ public class PersonService {
 		Optional<Person> result = personRepository.findById(id);
 		System.out.println(result);
 		return result;
-			
+
 	}
 
-	public Person updatePerson( UpdatePerson updatedPerson) {
+	public Person updatePerson(UpdatePerson updatedPerson) {
 		Person person = personRepository.findById(updatedPerson.getPersonId())
 				.orElseThrow(() -> new IllegalArgumentException("Invalid person id: " + updatedPerson.getPersonId()));
 
@@ -84,45 +82,45 @@ public class PersonService {
 	}
 
 	public Person automatePersonFitness(Long personId) {
-		Person person = personRepository.findById(personId).orElseThrow(() -> new IllegalArgumentException("Person Id not found:"+personId));
-		Period period = Period.between(person.getDateOfBirth(), LocalDate.now());
-		int personAge = period.getYears();
+		Person person = personRepository.findById(personId)
+				.orElseThrow(() -> new IllegalArgumentException("Person Id not found:" + personId));
+		int personAge = person.getPersonAge(person.getDateOfBirth());
 		AgeGroup ageGroup = AgeGroup.getAgeGroup(personAge);
-		
+
 		List<Fitness> allFitness = fitnessRepository.findAll();
-		if(person.getFitness().size() > 0 || allFitness.size() < 1) {
+		if (person.getFitness().size() > 0 || allFitness.size() < 1) {
 			return person;
 		}
-		Set<Fitness>fitnessSet = new HashSet<>();
+		Set<Fitness> fitnessSet = new HashSet<>();
 
-		switch(ageGroup) {
+		switch (ageGroup) {
 		case UNDER_18:
-			for(Fitness fitness : allFitness) {
-				if(fitnessSet.size() >= 2) {
+			for (Fitness fitness : allFitness) {
+				if (fitnessSet.size() >= 2) {
 					break;
 				}
-				if(fitness.getFitnessMode().equals(FitnessMode.EASY)) {
+				if (fitness.getFitnessMode().equals(FitnessMode.EASY)) {
 					fitnessSet.add(fitness);
 				}
-				if(fitness.getFitnessMode().equals(FitnessMode.MEDIUM)) {
+				if (fitness.getFitnessMode().equals(FitnessMode.MEDIUM)) {
 					fitnessSet.add(fitness);
 				}
 			}
 			break;
 		case FROM_18_TO_50:
-			for(Fitness fitness : allFitness) {
-				if(fitnessSet.size() >= 3) {
+			for (Fitness fitness : allFitness) {
+				if (fitnessSet.size() >= 3) {
 					break;
 				}
 				fitnessSet.add(fitness);
 			}
 			break;
 		case OVER_50:
-			for(Fitness fitness : allFitness) {
-				if(fitnessSet.size() >= 1) {
+			for (Fitness fitness : allFitness) {
+				if (fitnessSet.size() >= 1) {
 					break;
 				}
-				if(fitness.getFitnessMode().equals(FitnessMode.EASY)) {
+				if (fitness.getFitnessMode().equals(FitnessMode.EASY)) {
 					fitnessSet.add(fitness);
 				}
 			}

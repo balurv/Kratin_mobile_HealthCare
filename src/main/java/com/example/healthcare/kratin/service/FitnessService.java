@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.healthcare.kratin.model.Fitness;
 import com.example.healthcare.kratin.repository.FitnessRepository;
-import com.example.healthcare.kratin.repository.PersonRepository;
 
 @Service
 public class FitnessService {
@@ -16,8 +15,8 @@ public class FitnessService {
 	@Autowired
 	private FitnessRepository fitnessRepository;
 	
-	@Autowired
-	private PersonRepository personRepository;
+//	@Autowired
+//	private PersonRepository personRepository;
 
 	public Fitness createFitness(Fitness fitnessRequest) throws Exception {	
 		
