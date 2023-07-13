@@ -1,5 +1,6 @@
 package com.example.healthcare.kratin.service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,16 +9,23 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.healthcare.kratin.model.Fitness;
+import com.example.healthcare.kratin.model.Image;
 import com.example.healthcare.kratin.model.Person;
 import com.example.healthcare.kratin.model.enums.AgeGroup;
 import com.example.healthcare.kratin.model.enums.FitnessMode;
 import com.example.healthcare.kratin.repository.FitnessRepository;
+import com.example.healthcare.kratin.repository.ImageRepository;
 import com.example.healthcare.kratin.repository.PersonRepository;
+import com.example.healthcare.kratin.requestModel.Membership;
 import com.example.healthcare.kratin.requestModel.UpdatePerson;
+import com.example.healthcare.kratin.util.ImageUtil;
+import com.razorpay.*;
 
 @Service
 public class PersonService {
@@ -27,11 +35,15 @@ public class PersonService {
 	@Autowired
 	private FitnessRepository fitnessRepository;
 
+	@Autowired
+	private ImageRepository imageRepository;
+	
 	public Person createPerson(Person person) {
 		return personRepository.save(person);
 	}
 
 	public List<Person> getAllPerson() {
+		System.out.println("hello balu");
 		List<Person> person = new ArrayList<>();
 		personRepository.findAll().forEach(person::add);
 		Collections.sort(person, new Comparator<Person>() {
@@ -131,5 +143,46 @@ public class PersonService {
 		person.setFitness(fitnessSet);
 		personRepository.save(person);
 		return person;
+	}
+
+	public Double calculateBMI(Long personId) {
+		Person person = personRepository.findById(personId)
+				.orElseThrow(() -> new IllegalArgumentException("Person Id not found:" + personId));
+		double weight = person.getKg();
+		double height = (double) person.getHeight() / 100;
+		Double bmi = weight / (height * height);
+		return bmi;
+	}
+
+	public String createMembership(Membership membership) throws RazorpayException {
+		
+		var razorpayClient = new RazorpayClient("rzp_test_CeY2Pl2te31vRX", "saoiyO1PHzh7S91S0iixVxOu");
+
+		JSONObject orderRequest = new JSONObject();
+		orderRequest.put("amount", membership.getAmount() * 100); // amount in the smallest currency unit
+		orderRequest.put("currency", "INR");
+		orderRequest.put("receipt", "order_rcptid_11");
+		Order order = razorpayClient.orders.create(orderRequest);
+//		System.out.println(order);
+		return order.toString();
+	}
+
+	public void uploadImage(Long personId, MultipartFile file) throws IOException {
+		Person person = personRepository.findById(personId)
+				.orElseThrow(() -> new IllegalArgumentException("Person Id not found:" + personId));
+		Image image = new Image();
+		image.setImageData(ImageUtil.compressImage(file.getBytes()));
+		image.setPerson(person);
+		imageRepository.save(image);
+	}
+
+	public byte[] downloadImage(Long personId) {
+		
+//		Optional<Person> person = personRepository.findById(personId);
+		List<Image> image = imageRepository.findByPersonId(personId);
+		if(image.size() > 0) {
+			return ImageUtil.decompressImage(image.get(0).getImageData());
+		}
+		return null;
 	}
 }

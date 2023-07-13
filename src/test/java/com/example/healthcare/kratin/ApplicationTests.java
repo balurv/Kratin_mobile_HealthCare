@@ -14,7 +14,7 @@ import com.example.healthcare.kratin.model.enums.Gender;
 @SpringBootTest
 class ApplicationTests {
 
-	private Person balu = new Person("balu", "balurv1997@gmail.com", LocalDate.of(1997, 10, 01), "9035540770", Gender.MALE);
+	private Person balu = new Person("balu", "balurv1997@gmail.com", LocalDate.of(1997, 10, 01), "9035540770", Gender.MALE );
 
 	@Test
 	void personAge() {

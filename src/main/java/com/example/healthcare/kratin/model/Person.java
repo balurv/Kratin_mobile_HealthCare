@@ -28,6 +28,10 @@ public class Person {
 	private String name;
 
 	private String email;
+	
+	private int height;
+	
+	private int kg;
 
 	@Column(name = "date_of_birth")
 	private LocalDate dateOfBirth;
@@ -53,6 +57,22 @@ public class Person {
 		this.dateOfBirth = dateOfBirth;
 		this.phoneNumber = phoneNumber;
 		this.gender = gender;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
+	}
+
+	public int getKg() {
+		return kg;
+	}
+
+	public void setKg(int kg) {
+		this.kg = kg;
 	}
 
 	public Long getId() {
